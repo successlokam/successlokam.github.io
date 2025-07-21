@@ -1,0 +1,807 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="lite"> <!-- Default theme is now "lite" -->
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GenZume: Resume Builder for GenZ</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,400;0,700;1,400&family=Merriweather:ital,wght@0,400;0,700;1,400&family=Roboto:ital,wght@0,400;0,700;1,400&family=Source+Sans+Pro:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- jsPDF Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    
+    <!-- Custom Tailwind Config -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    animation: {
+                        'fade-in': 'fadeIn 0.5s ease-in-out',
+                        'slide-up': 'slideUp 0.3s ease-out',
+                        'fade-out': 'fadeOut 0.3s ease-out forwards'
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        /* --- THEME DEFINITIONS --- */
+
+        /* NEW DEFAULT: Lite Theme (Modern, Clean) */
+        :root, [data-theme="lite"] {
+            /* Backgrounds */
+            --bg-primary: #f1f5f9; /* slate-100 */
+            --card-bg: #ffffff;
+            --input-bg: #f8fafc; /* slate-50 */
+            --dynamic-item-bg: #f8fafc; /* slate-50 */
+
+            /* Text */
+            --text-primary: #1e293b; /* slate-800 */
+            --text-secondary: #64748b; /* slate-500 */
+            --text-placeholder: #94a3b8; /* slate-400 */
+            --text-danger: #dc2626; /* red-600 */
+            --text-danger-hover: #b91c1c; /* red-700 */
+
+            /* Borders & Dividers */
+            --card-border: #e2e8f0; /* slate-200 */
+            --input-border: #cbd5e1; /* slate-300 */
+            --dynamic-item-border: #e2e8f0; /* slate-200 */
+            --divider-color: #cbd5e1; /* slate-300 */
+
+            /* Accents & Buttons */
+            --accent-primary: #4f46e5; /* indigo-600 */
+            --accent-primary-hover: #4338ca; /* indigo-700 */
+            --accent-secondary: #e2e8f0; /* slate-200 */
+            --accent-secondary-hover: #cbd5e1; /* slate-300 */
+            --accent-success: #10b981; /* emerald-500 */
+            --accent-success-hover: #059669; /* emerald-600 */
+            
+            /* Effects */
+            --card-backdrop-filter: none;
+            --card-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.07), 0 2px 4px -2px rgb(0 0 0 / 0.07);
+            --input-focus-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2);
+            --font-selector-option-text: #1e293b; /* slate-800 */
+        }
+        
+        /* NEW: Dark Theme (Cool, Slate-based) */
+        [data-theme="dark"] {
+            /* Backgrounds */
+            --bg-primary: #0f172a; /* slate-900 */
+            --card-bg: #1e293b; /* slate-800 */
+            --input-bg: #334155; /* slate-700 */
+            --dynamic-item-bg: #1e293b; /* slate-800 */
+
+            /* Text */
+            --text-primary: #e2e8f0; /* slate-200 */
+            --text-secondary: #94a3b8; /* slate-400 */
+            --text-placeholder: #64748b; /* slate-500 */
+            --text-danger: #f87171; /* red-400 */
+            --text-danger-hover: #ef4444; /* red-500 */
+
+            /* Borders & Dividers */
+            --card-border: #334155; /* slate-700 */
+            --input-border: #475569; /* slate-600 */
+            --dynamic-item-border: #334155; /* slate-700 */
+            --divider-color: #475569; /* slate-600 */
+
+            /* Accents & Buttons */
+            --accent-primary: #818cf8; /* indigo-400 */
+            --accent-primary-hover: #6366f1; /* indigo-500 */
+            --accent-secondary: #334155; /* slate-700 */
+            --accent-secondary-hover: #475569; /* slate-600 */
+            --accent-success: #34d399; /* emerald-400 */
+            --accent-success-hover: #10b981; /* emerald-500 */
+            
+            /* Effects */
+            --card-backdrop-filter: none;
+            --card-shadow: none;
+            --input-focus-shadow: 0 0 0 3px rgba(129, 140, 248, 0.25);
+            --font-selector-option-text: #1e293b; /* slate-800 */
+        }
+        
+        /* NEW: Forest Theme (replaces "colourful") */
+        [data-theme="forest"] {
+            /* Backgrounds */
+            --bg-primary: #f0fdf4; /* green-50 */
+            --card-bg: #ffffff;
+            --input-bg: #ffffff;
+            --dynamic-item-bg: #f0fdf4; /* green-50 */
+
+            /* Text */
+            --text-primary: #1f2937; /* gray-800 */
+            --text-secondary: #4b5563; /* gray-600 */
+            --text-placeholder: #9ca3af; /* gray-400 */
+            --text-danger: #dc2626; /* red-600 */
+            --text-danger-hover: #b91c1c; /* red-700 */
+
+            /* Borders & Dividers */
+            --card-border: #bbf7d0; /* green-200 */
+            --input-border: #86efac; /* green-300 */
+            --dynamic-item-border: #bbf7d0; /* green-200 */
+            --divider-color: #86efac; /* green-300 */
+
+            /* Accents & Buttons */
+            --accent-primary: #22c55e; /* green-500 */
+            --accent-primary-hover: #16a34a; /* green-600 */
+            --accent-secondary: #dcfce7; /* green-100 */
+            --accent-secondary-hover: #bbf7d0; /* green-200 */
+            --accent-success: #3b82f6; /* blue-500 */
+            --accent-success-hover: #2563eb; /* blue-600 */
+            
+            /* Effects */
+            --card-backdrop-filter: none;
+            --card-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.07), 0 2px 4px -2px rgb(0 0 0 / 0.07);
+            --input-focus-shadow: 0 0 0 3px rgba(34, 197, 94, 0.2);
+            --font-selector-option-text: #1f2937; /* gray-800 */
+        }
+        
+        /* --- UTILITY CLASSES using CSS Variables --- */
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            transition: background 0.3s ease-in-out, color 0.3s ease-in-out;
+        }
+        
+        .card {
+            background: var(--card-bg);
+            backdrop-filter: var(--card-backdrop-filter);
+            -webkit-backdrop-filter: var(--card-backdrop-filter);
+            border: 1px solid var(--card-border);
+            box-shadow: var(--card-shadow);
+            transition: background 0.3s ease, border-color 0.3s ease;
+        }
+        
+        .divider { border-color: var(--divider-color); }
+        .text-secondary { color: var(--text-secondary); }
+        .text-danger { color: var(--text-danger); }
+        .text-danger:hover { color: var(--text-danger-hover); }
+        
+        .input-themed, .select-themed {
+            background-color: var(--input-bg);
+            border: 1px solid var(--input-border);
+            color: var(--text-primary);
+            transition: background-color 0.3s, border-color 0.3s, box-shadow 0.3s;
+        }
+        .input-themed::placeholder { color: var(--text-placeholder); }
+        .input-themed:focus, .select-themed:focus {
+            box-shadow: var(--input-focus-shadow);
+            border-color: var(--accent-primary);
+            outline: none;
+        }
+        .dynamic-item-card {
+            background-color: var(--dynamic-item-bg);
+            border: 1px solid var(--dynamic-item-border);
+        }
+        
+        .btn-primary { background-color: var(--accent-primary); color: white; }
+        .btn-primary:hover { background-color: var(--accent-primary-hover); }
+        .btn-secondary { background-color: var(--accent-secondary); color: var(--text-primary); }
+        .btn-secondary:hover { background-color: var(--accent-secondary-hover); }
+        .btn-success { background-color: var(--accent-success); color: white; }
+        .btn-success:hover { background-color: var(--accent-success-hover); }
+        .btn { transition: background-color 0.3s, transform 0.2s, box-shadow 0.2s; }
+        
+        select option { color: var(--font-selector-option-text); background-color: #ffffff; }
+        
+        /* --- ANIMATIONS & CORE STYLES --- */
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        @keyframes fadeOut { from { opacity: 1; transform: scale(1); } to { opacity: 0; transform: scale(0.95); } }
+        
+        .btn-hover:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* Theme switcher styles */
+        .theme-btn {
+            background-color: transparent;
+            border: 2px solid transparent;
+            padding: 0.5rem;
+            border-radius: 9999px; /* circle */
+            color: var(--text-secondary);
+            line-height: 1;
+        }
+        .theme-btn:hover {
+            color: var(--text-primary);
+        }
+        .theme-btn.active {
+            color: var(--accent-primary);
+            border-color: var(--accent-primary);
+            background-color: var(--accent-secondary);
+        }
+    </style>
+</head>
+<body class="min-h-screen font-sans">
+    <!-- Header -->
+    <nav class="card p-4 mb-8 sticky top-0 z-20">
+        <div class="container mx-auto flex justify-between items-center">
+            <h1 class="text-xl md:text-2xl font-bold flex items-center">
+                <i class="fas fa-file-alt mr-3 text-secondary"></i>
+                GenZume App
+            </h1>
+            <div class="flex items-center space-x-2 md:space-x-4">
+                <!-- THEME SWITCHER -->
+                <div id="theme-switcher" class="flex items-center space-x-1 p-1 rounded-full card" style="background-color: var(--bg-primary);">
+                    <button data-theme="lite" title="Lite Theme" class="theme-btn transition-all duration-300"><i class="fas fa-sun"></i></button>
+                    <button data-theme="dark" title="Dark Theme" class="theme-btn transition-all duration-300"><i class="fas fa-moon"></i></button>
+                    <button data-theme="forest" title="Forest Theme" class="theme-btn transition-all duration-300"><i class="fas fa-leaf"></i></button>
+                </div>
+                <!-- Desktop Action Buttons -->
+                <div class="hidden lg:flex items-center space-x-4">
+                    <button id="desktopPreviewBtn" class="px-4 py-2 btn btn-secondary rounded-lg btn-hover">
+                        <i class="fas fa-eye mr-2"></i>Preview
+                    </button>
+                    <button id="desktopDownloadBtn" class="px-4 py-2 btn btn-success rounded-lg btn-hover">
+                        <i class="fas fa-download mr-2"></i>Download PDF
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+    
+    <!-- Source Code Link -->
+    <div class="text-center text-sm text-secondary mb-6 -mt-4">
+        Source code available at 
+        <a href="https://github.com/successlokam/genzume-resume-builder" target="_blank" rel="noopener noreferrer" class="font-semibold underline hover:text-primary transition-colors">
+            <i class="fab fa-github"></i> GitHub
+        </a>
+    </div>
+
+    <!-- Main Container -->
+    <div class="container mx-auto px-4 pb-24 lg:pb-8">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            
+            <!-- Form Section -->
+            <div class="card rounded-2xl p-4 md:p-8 animate-fade-in">
+                <h2 class="text-2xl font-bold mb-6 flex items-center">
+                    <i class="fas fa-edit mr-3 text-secondary"></i>
+                    Resume Information
+                </h2>
+                
+                <form id="resumeForm" class="space-y-6">
+                    <!-- Customization Section -->
+                    <div class="animate-slide-up">
+                        <h3 class="text-lg font-semibold mb-4 border-b divider pb-2">
+                            <i class="fas fa-palette mr-2 text-secondary"></i>Customization
+                        </h3>
+                        <div>
+                            <label for="fontSelector" class="block mb-2 text-sm font-medium text-secondary">Choose a Font</label>
+                            <select id="fontSelector" class="w-full p-3 rounded-lg select-themed">
+                                <option value="Roboto">Roboto (Modern, Sans-serif)</option>
+                                <option value="Lato">Lato (Friendly, Sans-serif)</option>
+                                <option value="Merriweather">Merriweather (Classic, Serif)</option>
+                                <option value="Source Sans Pro">Source Sans Pro (Clean, Sans-serif)</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <!-- Personal Information -->
+                    <div class="animate-slide-up" style="animation-delay: 0.05s;">
+                        <h3 class="text-lg font-semibold mb-4 border-b divider pb-2">
+                            <i class="fas fa-user mr-2 text-secondary"></i>Personal Information
+                        </h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <input type="text" id="fullName" placeholder="Full Name" class="w-full p-3 rounded-lg input-themed" required>
+                            <input type="text" id="location" placeholder="City, Country" class="w-full p-3 rounded-lg input-themed" required>
+                            <input type="tel" id="phone" placeholder="Phone Number" class="w-full p-3 rounded-lg input-themed" required>
+                            <input type="email" id="email" placeholder="Email Address" class="w-full p-3 rounded-lg input-themed" required>
+                            <input type="url" id="link1" placeholder="Profile / Website URL 1" class="w-full p-3 rounded-lg input-themed">
+                            <input type="url" id="link2" placeholder="Profile / Website URL 2" class="w-full p-3 rounded-lg input-themed">
+                        </div>
+                    </div>
+
+                    <!-- Professional Summary -->
+                    <div class="animate-slide-up" style="animation-delay: 0.1s;">
+                        <h3 class="text-lg font-semibold mb-4 border-b divider pb-2">
+                            <i class="fas fa-bullseye mr-2 text-secondary"></i>Professional Summary
+                        </h3>
+                        <textarea id="summary" placeholder="Write a brief summary of your skills and career objectives..." rows="4" class="w-full p-3 rounded-lg input-themed"></textarea>
+                    </div>
+
+                    <!-- Experience Section -->
+                    <div class="animate-slide-up" style="animation-delay: 0.15s;">
+                        <h3 class="text-lg font-semibold mb-4 border-b divider pb-2 flex justify-between items-center">
+                            <span><i class="fas fa-briefcase mr-2 text-secondary"></i>Experience</span>
+                            <button type="button" id="addExperience" class="text-sm btn btn-primary px-3 py-1 rounded-lg">
+                                <i class="fas fa-plus mr-1"></i>Add
+                            </button>
+                        </h3>
+                        <div id="experienceContainer" class="space-y-4">
+                            <!-- Experience items will be injected here by JS -->
+                        </div>
+                    </div>
+
+                    <!-- Education Section -->
+                    <div class="animate-slide-up" style="animation-delay: 0.2s;">
+                        <h3 class="text-lg font-semibold mb-4 border-b divider pb-2 flex justify-between items-center">
+                            <span><i class="fas fa-graduation-cap mr-2 text-secondary"></i>Education</span>
+                            <button type="button" id="addEducation" class="text-sm btn btn-primary px-3 py-1 rounded-lg">
+                                <i class="fas fa-plus mr-1"></i>Add
+                            </button>
+                        </h3>
+                        <div id="educationContainer" class="space-y-4">
+                            <!-- Education items will be injected here by JS -->
+                        </div>
+                    </div>
+
+                    <!-- Projects Section -->
+                    <div class="animate-slide-up" style="animation-delay: 0.25s;">
+                        <h3 class="text-lg font-semibold mb-4 border-b divider pb-2 flex justify-between items-center">
+                            <span><i class="fas fa-project-diagram mr-2 text-secondary"></i>Projects</span>
+                            <button type="button" id="addProject" class="text-sm btn btn-primary px-3 py-1 rounded-lg">
+                                <i class="fas fa-plus mr-1"></i>Add
+                            </button>
+                        </h3>
+                        <div id="projectsContainer" class="space-y-4">
+                           <!-- Project items will be injected here by JS -->
+                        </div>
+                    </div>
+
+                    <!-- Skills Section -->
+                    <div class="animate-slide-up" style="animation-delay: 0.3s;">
+                        <h3 class="text-lg font-semibold mb-4 border-b divider pb-2">
+                            <i class="fas fa-cogs mr-2 text-secondary"></i>Technical Skills
+                        </h3>
+                        <textarea id="skills" placeholder="Enter skills, comma-separated..." rows="4" class="w-full p-3 rounded-lg input-themed"></textarea>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Preview Section (Stacks on mobile, sticky on desktop) -->
+            <div id="preview-container" class="lg:sticky top-28 animate-fade-in">
+                <div class="card rounded-2xl p-4 md:p-8">
+                    <h2 class="text-2xl font-bold mb-6 flex items-center">
+                        <i class="fas fa-eye mr-3 text-secondary"></i>
+                        Live Preview
+                    </h2>
+                    
+                    <div id="resumePreview" class="bg-white rounded-lg p-6 text-gray-800 shadow-2xl overflow-auto max-h-[70vh]">
+                        <div class="text-center mb-6">
+                            <h1 id="previewName" class="text-3xl font-bold text-gray-800 mb-2">Your Name</h1>
+                            <p id="previewContact" class="text-sm text-gray-600">Your contact information will appear here</p>
+                        </div>
+                        
+                        <div id="previewContent" class="space-y-6">
+                            <p class="text-gray-500 text-center italic">Start filling out the form to see your resume preview</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- RESPONSIVE UI: Mobile Preview Modal -->
+    <div id="mobilePreviewModal" class="fixed inset-0 bg-black bg-opacity-50 z-40 hidden items-center justify-center p-2 sm:p-4 animate-fade-in">
+        <div class="card rounded-2xl w-full max-w-4xl h-[95vh] flex flex-col">
+            <div class="p-4 border-b divider flex justify-between items-center flex-shrink-0">
+                <h2 class="text-lg font-bold">Resume Preview</h2>
+                <button id="closeModalBtn" class="text-2xl text-secondary hover:text-primary transition-colors">×</button>
+            </div>
+            <div id="modalContent" class="overflow-auto flex-grow p-2">
+                <!-- Preview from #resumePreview will be injected here -->
+            </div>
+        </div>
+    </div>
+    
+    <!-- RESPONSIVE UI: Mobile Bottom Action Bar -->
+    <div id="mobile-actions" class="lg:hidden fixed bottom-0 left-0 right-0 z-30 p-2 border-t" style="background-color: var(--card-bg); border-color: var(--card-border); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); background-color: rgba(255, 255, 255, 0.7);">
+        <div class="container mx-auto flex justify-around items-center space-x-2">
+            <button id="mobilePreviewBtn" class="w-full px-4 py-3 btn btn-secondary rounded-lg font-semibold flex-1">
+                <i class="fas fa-eye mr-2"></i>Preview
+            </button>
+            <button id="mobileDownloadBtn" class="w-full px-4 py-3 btn btn-success rounded-lg font-semibold flex-1">
+                <i class="fas fa-download mr-2"></i>Download
+            </button>
+        </div>
+    </div>
+
+
+    <!-- Success Toast -->
+    <div id="successToast" class="fixed top-24 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg transform translate-x-full transition-transform duration-300 z-50">
+        <i class="fas fa-check-circle mr-2"></i>
+        <span>Resume PDF generated successfully!</span>
+    </div>
+
+    <!-- Error Toast -->
+    <div id="errorToast" class="fixed top-24 right-4 bg-red-500 text-white px-6 py-3 rounded-lg shadow-lg transform translate-x-full transition-transform duration-300 z-50">
+        <i class="fas fa-exclamation-circle mr-2"></i>
+        <span>Please fill in your Name and Email!</span>
+    </div>
+
+    <!-- Privacy Pop-up -->
+    <div id="privacy-overlay" class="fixed inset-0 bg-black bg-opacity-70 z-50 flex items-center justify-center p-4 opacity-0 transition-opacity duration-500 ease-in-out">
+        <div id="privacy-modal" class="card rounded-2xl p-8 max-w-lg w-full text-center transform scale-95 transition-all duration-300 ease-out">
+            <h2 class="text-2xl font-bold mb-4 flex items-center justify-center">
+                <i class="fas fa-shield-alt mr-3"></i>
+                Our Commitment to Your Privacy
+            </h2>
+            <p class="text-secondary mb-6">
+                Your privacy is paramount. This website operates entirely on your device and <strong>DOES NOT COLLECT, STORE, OR TRANSMIT ANY OF YOUR PERSONAL DATA</strong>. All information you enter is processed in your browser.
+            </p>
+            <button id="agreeBtn" class="w-full px-6 py-3 btn btn-success text-white rounded-lg btn-hover text-lg font-semibold">
+                I Understand and Agree
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Global data object
+        let resumeData = {
+            personal: {},
+            font: 'Roboto', // Default font
+            summary: '',
+            experience: [],
+            education: [],
+            projects: [],
+            skills: ''
+        };
+
+        // Initialize the application on DOM load
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeTheme();
+            initializeEventListeners();
+            initializePrivacyModal();
+            populateFormWithSampleData();
+            updateResumeData(); // Initial call to sync data and preview
+        });
+
+        // --- THEME SWITCHER LOGIC ---
+        function initializeTheme() {
+            const savedTheme = localStorage.getItem('resume-theme') || 'lite'; // Default to new "lite" theme
+            setTheme(savedTheme);
+
+            const themeSwitcher = document.getElementById('theme-switcher');
+            themeSwitcher.addEventListener('click', (e) => {
+                const themeButton = e.target.closest('.theme-btn');
+                if (themeButton) {
+                    const newTheme = themeButton.dataset.theme;
+                    setTheme(newTheme);
+                }
+            });
+        }
+        
+        function setTheme(themeName) {
+            document.documentElement.setAttribute('data-theme', themeName);
+            localStorage.setItem('resume-theme', themeName);
+
+            // Update active button state
+            document.querySelectorAll('.theme-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.theme === themeName);
+            });
+        }
+        // --- END THEME SWITCHER LOGIC ---
+
+        function initializePrivacyModal() {
+            const privacyOverlay = document.getElementById('privacy-overlay');
+            const privacyModal = document.getElementById('privacy-modal');
+            const agreeBtn = document.getElementById('agreeBtn');
+
+            if (sessionStorage.getItem('privacyAccepted')) {
+                privacyOverlay.classList.add('hidden');
+            } else {
+                setTimeout(() => {
+                    privacyOverlay.classList.remove('opacity-0');
+                    privacyModal.classList.remove('scale-95');
+                }, 100);
+            }
+
+            agreeBtn.addEventListener('click', () => {
+                sessionStorage.setItem('privacyAccepted', 'true');
+                privacyOverlay.classList.add('opacity-0');
+                privacyModal.classList.add('scale-95');
+                setTimeout(() => {
+                    privacyOverlay.classList.add('hidden');
+                }, 500);
+            });
+        }
+        
+        function initializeEventListeners() {
+            document.getElementById('resumeForm').addEventListener('input', updateResumeData);
+            document.getElementById('addExperience').addEventListener('click', () => addSection('experience'));
+            document.getElementById('addEducation').addEventListener('click', () => addSection('education'));
+            document.getElementById('addProject').addEventListener('click', () => addSection('project'));
+            
+            // --- RESPONSIVE EVENT LISTENERS ---
+            // Desktop-only buttons
+            document.getElementById('desktopPreviewBtn').addEventListener('click', scrollToPreview);
+            document.getElementById('desktopDownloadBtn').addEventListener('click', generatePDF);
+
+            // Mobile-only buttons and modal controls
+            const mobilePreviewBtn = document.getElementById('mobilePreviewBtn');
+            const mobileDownloadBtn = document.getElementById('mobileDownloadBtn');
+            const closeModalBtn = document.getElementById('closeModalBtn');
+            const mobilePreviewModal = document.getElementById('mobilePreviewModal');
+
+            if (mobilePreviewBtn) mobilePreviewBtn.addEventListener('click', showPreviewModal);
+            if (mobileDownloadBtn) mobileDownloadBtn.addEventListener('click', generatePDF);
+            if (closeModalBtn) closeModalBtn.addEventListener('click', hidePreviewModal);
+
+            // Close modal if clicking on the dark background overlay
+            if (mobilePreviewModal) {
+                mobilePreviewModal.addEventListener('click', (e) => {
+                    if (e.target === mobilePreviewModal) {
+                        hidePreviewModal();
+                    }
+                });
+            }
+            // --- END RESPONSIVE LISTENERS ---
+
+            document.addEventListener('click', function(e) {
+                const target = e.target.closest('.remove-btn');
+                if (!target) return;
+
+                const item = target.closest('.dynamic-item');
+                if (item) {
+                    item.classList.add('animate-fade-out');
+                    setTimeout(() => {
+                        item.remove();
+                        updateResumeData();
+                    }, 300);
+                }
+            });
+        }
+        
+        // --- RESPONSIVE UI FUNCTIONS ---
+        function showPreviewModal() {
+            const modalContent = document.getElementById('modalContent');
+            const originalPreview = document.getElementById('resumePreview');
+
+            // Clone the live preview content into the modal to show the latest version
+            const clonedPreview = originalPreview.cloneNode(true);
+            clonedPreview.id = 'modalResumePreview'; // Give it a new ID to avoid duplicates
+            clonedPreview.style.maxHeight = 'none'; // Allow it to scroll freely within the modal
+
+            modalContent.innerHTML = ''; // Clear previous content
+            modalContent.appendChild(clonedPreview);
+
+            // Show the modal
+            const mobilePreviewModal = document.getElementById('mobilePreviewModal');
+            mobilePreviewModal.classList.remove('hidden');
+            mobilePreviewModal.classList.add('flex');
+            document.body.style.overflow = 'hidden'; // Prevent background scrolling
+        }
+
+        function hidePreviewModal() {
+            const mobilePreviewModal = document.getElementById('mobilePreviewModal');
+            mobilePreviewModal.classList.add('hidden');
+            mobilePreviewModal.classList.remove('flex');
+            document.body.style.overflow = ''; // Restore scrolling
+        }
+        // --- END RESPONSIVE UI FUNCTIONS ---
+
+        function populateFormWithSampleData() {
+            document.getElementById('fontSelector').value = 'Roboto';
+            document.getElementById('fullName').value = 'James Doe';
+            document.getElementById('location').value = 'San Francisco, CA';
+            document.getElementById('phone').value = '415-555-0101';
+            document.getElementById('email').value = 'jamesdoe7346@email.com';
+            document.getElementById('link1').value = 'https://linkedin.com/in/jamesdoe7346';
+            document.getElementById('link2').value = 'https://github.com/jamesdoe7346';
+            document.getElementById('summary').value = 'Results-driven Senior Software Engineer with over 10 years of experience in designing, developing, and deploying scalable, high-performance web applications. Expert in full-stack development with a strong focus on modern JavaScript frameworks (React, Node) and cloud-native architecture (AWS, Docker, Kubernetes). Proven leader in agile environments, adept at mentoring junior developers and driving technical excellence across teams.';
+            addSection('experience');
+            addSection('experience');
+            const expItems = document.querySelectorAll('.experience-item');
+            expItems[0].querySelector('.exp-company').value = 'Innovatech Solutions Inc.';
+            expItems[0].querySelector('.exp-title').value = 'Senior Software Engineer';
+            expItems[0].querySelector('.exp-start').value = 'Mar 2018';
+            expItems[0].querySelector('.exp-end').value = 'Present';
+            expItems[0].querySelector('.exp-location').value = 'San Francisco, CA';
+            expItems[0].querySelector('.exp-description').value = 'Led the development of a multi-tenant SaaS platform, reducing page load times by 40% through performance optimization and code splitting.\nArchitected and implemented a microservices-based backend using Node, Express, and Docker, improving system scalability and resilience.\nMentored a team of 4 junior and mid-level engineers, fostering a culture of collaboration and continuous improvement.';
+            expItems[1].querySelector('.exp-company').value = 'DataStream Analytics';
+            expItems[1].querySelector('.exp-title').value = 'Software Engineer';
+            expItems[1].querySelector('.exp-start').value = 'Jun 2014';
+            expItems[1].querySelector('.exp-end').value = 'Feb 2018';
+            expItems[1].querySelector('.exp-location').value = 'Austin, TX';
+            expItems[1].querySelector('.exp-description').value = 'Developed and maintained key features for a large-scale data analytics dashboard using Python, Django, and React.\nCollaborated with cross-functional teams to define, design, and ship new features in an agile environment.\nContributed to the migration of legacy database systems to PostgreSQL, ensuring data integrity and minimal downtime.';
+            addSection('education');
+            const eduItem = document.querySelector('.education-item');
+            eduItem.querySelector('.edu-institution').value = 'University of Techville';
+            eduItem.querySelector('.edu-degree').value = 'Bachelor of Science in Computer Science';
+            eduItem.querySelector('.edu-start').value = '2010';
+            eduItem.querySelector('.edu-end').value = '2014';
+            eduItem.querySelector('.edu-location').value = 'Techville, USA';
+            eduItem.querySelector('.edu-details').value = 'Graduated with High Honors.\nRelevant Coursework: Data Structures & Algorithms, Software Engineering, Database Systems.';
+            addSection('project');
+            const projItem = document.querySelector('.project-item');
+            projItem.querySelector('.proj-name').value = 'Real-Time Collaborative Code Editor';
+            projItem.querySelector('.proj-tech').value = 'React, Node, WebSockets, Redis, Docker';
+            projItem.querySelector('.proj-date').value = '2022';
+            projItem.querySelector('.proj-description').value = 'Personal project to build a web-based IDE for real-time pair programming.\nImplemented Operational Transformation (OT) algorithms to ensure conflict-free collaborative editing.\nContainerized the application using Docker and deployed on AWS ECS for high availability.';
+            document.getElementById('skills').value = 'JavaScript, TypeScript, Python, Go, SQL, HTML/CSS, React, Node, Express, Django, Next, PostgreSQL, MongoDB, Redis, AWS (EC2, S3, Lambda, RDS), Docker, Kubernetes, CI/CD, Terraform, Git, Jira, Agile Methodologies, System Design';
+        }
+
+        function addSection(type) {
+            let container, template;
+            switch(type) {
+                case 'experience': container = document.getElementById('experienceContainer'); template = createExperienceTemplate(); break;
+                case 'education': container = document.getElementById('educationContainer'); template = createEducationTemplate(); break;
+                case 'project': container = document.getElementById('projectsContainer'); template = createProjectTemplate(); break;
+            }
+            if (container && template) {
+                container.appendChild(template);
+                template.classList.add('animate-slide-up');
+            }
+        }
+
+        function createExperienceTemplate(){
+            const div = document.createElement('div');
+            div.className = 'experience-item dynamic-item p-4 dynamic-item-card rounded-lg';
+            div.innerHTML = `<div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3"><input type="text" placeholder="Company Name" class="exp-company w-full p-2 rounded input-themed"><input type="text" placeholder="Job Title" class="exp-title w-full p-2 rounded input-themed"><input type="text" placeholder="Start Date" class="exp-start w-full p-2 rounded input-themed"><input type="text" placeholder="End Date" class="exp-end w-full p-2 rounded input-themed"><input type="text" placeholder="Location" class="exp-location col-span-1 md:col-span-2 w-full p-2 rounded input-themed"></div><textarea placeholder="Job Description (separate points with new lines)" rows="4" class="exp-description w-full p-2 rounded input-themed"></textarea><button type="button" class="remove-btn remove-experience mt-2 text-danger text-sm"><i class="fas fa-trash mr-1"></i>Remove</button>`;
+            return div;
+        }
+        
+        function createEducationTemplate(){
+            const div = document.createElement('div');
+            div.className = 'education-item dynamic-item p-4 dynamic-item-card rounded-lg';
+            div.innerHTML = `<div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3"><input type="text" placeholder="Institution Name" class="edu-institution w-full p-2 rounded input-themed"><input type="text" placeholder="Degree" class="edu-degree w-full p-2 rounded input-themed"><input type="text" placeholder="Start Date" class="edu-start w-full p-2 rounded input-themed"><input type="text" placeholder="End Date" class="edu-end w-full p-2 rounded input-themed"><input type="text" placeholder="Location" class="edu-location col-span-1 md:col-span-2 w-full p-2 rounded input-themed"></div><textarea placeholder="Key achievements/coursework (separate points with new lines)" rows="3" class="edu-details w-full p-2 rounded input-themed"></textarea><button type="button" class="remove-btn remove-education mt-2 text-danger text-sm"><i class="fas fa-trash mr-1"></i>Remove</button>`;
+            return div;
+        }
+
+        function createProjectTemplate(){
+            const div = document.createElement('div');
+            div.className = 'project-item dynamic-item p-4 dynamic-item-card rounded-lg';
+            div.innerHTML = `<div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3"><input type="text" placeholder="Project Name" class="proj-name w-full p-2 rounded input-themed"><input type="text" placeholder="Technologies Used" class="proj-tech w-full p-2 rounded input-themed"></div><input type="text" placeholder="Date" class="proj-date w-full p-2 rounded input-themed mb-3"><textarea placeholder="Project Description (separate points with new lines)" rows="3" class="proj-description w-full p-2 rounded input-themed"></textarea><button type="button" class="remove-btn remove-project mt-2 text-danger text-sm"><i class="fas fa-trash mr-1"></i>Remove</button>`;
+            return div;
+        }
+        
+        // --- HELPER FUNCTIONS ---
+        function getLinkNameFromUrl(url) {
+            if (!url) return '';
+            try {
+                const fullUrl = ensureProtocol(url);
+                const hostname = new URL(fullUrl).hostname;
+                const domain = hostname.replace(/^www\./, '');
+                const name = domain.split('.')[0];
+                return name.charAt(0).toUpperCase() + name.slice(1);
+            } catch (e) {
+                return url;
+            }
+        }
+        
+        function ensureProtocol(url) {
+            if (!url) return '';
+            if (!/^(https?|ftp):\/\//i.test(url)) {
+                return 'https://' + url;
+            }
+            return url;
+        }
+        
+        function linkifyHtml(text) {
+            if (!text) return '';
+            const urlRegex = /((?:https?:\/\/|www\.)[^\s"'<>()]+|[a-zA-Z0-9-]+\.[a-zA-Z]{2,}[^\s"'<>()]*)/g;
+            return text.replace(urlRegex, (url) => {
+                const linkName = getLinkNameFromUrl(url);
+                const fullUrl = ensureProtocol(url);
+                return `<a href="${fullUrl}" target="_blank" class="text-blue-600 hover:underline">${linkName}</a>`;
+            });
+        }
+        
+        // --- CORE LOGIC: DATA & PREVIEW ---
+        function updateResumeData() {
+            resumeData.font = document.getElementById('fontSelector').value;
+            resumeData.personal = { fullName: document.getElementById('fullName').value, location: document.getElementById('location').value, phone: document.getElementById('phone').value, email: document.getElementById('email').value, link1: document.getElementById('link1').value, link2: document.getElementById('link2').value };
+            resumeData.summary = document.getElementById('summary').value;
+            resumeData.experience = Array.from(document.querySelectorAll('.experience-item')).map(item => ({ company: item.querySelector('.exp-company').value, title: item.querySelector('.exp-title').value, startDate: item.querySelector('.exp-start').value, endDate: item.querySelector('.exp-end').value, location: item.querySelector('.exp-location').value, description: item.querySelector('.exp-description').value })).filter(exp => exp.company || exp.title);
+            resumeData.education = Array.from(document.querySelectorAll('.education-item')).map(item => ({ institution: item.querySelector('.edu-institution').value, degree: item.querySelector('.edu-degree').value, startDate: item.querySelector('.edu-start').value, endDate: item.querySelector('.edu-end').value, location: item.querySelector('.edu-location').value, details: item.querySelector('.edu-details').value })).filter(edu => edu.institution || edu.degree);
+            resumeData.projects = Array.from(document.querySelectorAll('.project-item')).map(item => ({ name: item.querySelector('.proj-name').value, technologies: item.querySelector('.proj-tech').value, date: item.querySelector('.proj-date').value, description: item.querySelector('.proj-description').value })).filter(proj => proj.name);
+            resumeData.skills = document.getElementById('skills').value;
+            updatePreview();
+        }
+
+        function updatePreview() {
+            const previewElement = document.getElementById('resumePreview');
+            previewElement.style.fontFamily = resumeData.font === 'Merriweather' ? `'Merriweather', serif` : `'${resumeData.font}', sans-serif`;
+            document.getElementById('previewName').textContent = resumeData.personal.fullName || 'Your Name';
+            let contactItems = [resumeData.personal.location, resumeData.personal.phone, resumeData.personal.email].filter(Boolean);
+            [resumeData.personal.link1, resumeData.personal.link2].forEach(linkUrl => {
+                if (linkUrl) {
+                    const linkName = getLinkNameFromUrl(linkUrl);
+                    if (linkName) contactItems.push(`<a href="${ensureProtocol(linkUrl)}" target="_blank" class="text-blue-600 hover:underline">${linkName}</a>`);
+                }
+            });
+            document.getElementById('previewContact').innerHTML = contactItems.join(' | ') || 'Your contact information will appear here';
+            let content = '';
+            if (resumeData.summary) content += `<div class="mb-4"><h3 class="text-lg font-bold border-b-2 border-gray-300 mb-2 pb-1">SUMMARY</h3><p class="text-sm">${linkifyHtml(resumeData.summary)}</p></div>`;
+            if (resumeData.experience.length > 0) {
+                content += '<div class="mb-4"><h3 class="text-lg font-bold border-b-2 border-gray-300 mb-2 pb-1">EXPERIENCE</h3>';
+                resumeData.experience.forEach(exp => {
+                    content += `<div class="mb-3"><div class="flex justify-between items-start flex-wrap gap-x-2"><div><h4 class="font-semibold">${exp.company}</h4><p class="text-sm italic">${exp.title}</p></div><div class="text-left sm:text-right text-sm flex-shrink-0"><p class="font-semibold">${exp.startDate} - ${exp.endDate}</p><p class="italic">${exp.location}</p></div></div>`;
+                    if (exp.description) { content += '<ul class="text-sm mt-1 ml-4 list-disc">'; exp.description.split('\n').filter(p => p.trim()).forEach(p => content += `<li class="mb-1">${linkifyHtml(p.trim())}</li>`); content += '</ul>'; }
+                    content += '</div>';
+                }); content += '</div>';
+            }
+            if (resumeData.education.length > 0) {
+                content += '<div class="mb-4"><h3 class="text-lg font-bold border-b-2 border-gray-300 mb-2 pb-1">EDUCATION</h3>';
+                resumeData.education.forEach(edu => {
+                    content += `<div class="mb-3"><div class="flex justify-between items-start flex-wrap gap-x-2"><div><h4 class="font-semibold">${edu.institution}</h4><p class="text-sm italic">${edu.degree}</p></div><div class="text-left sm:text-right text-sm flex-shrink-0"><p class="font-semibold">${edu.startDate} - ${edu.endDate}</p><p class="italic">${edu.location}</p></div></div>`;
+                    if (edu.details) { content += '<ul class="text-sm mt-1 ml-4 list-disc">'; edu.details.split('\n').filter(p => p.trim()).forEach(p => content += `<li class="mb-1">${linkifyHtml(p.trim())}</li>`); content += '</ul>'; }
+                    content += '</div>';
+                }); content += '</div>';
+            }
+            if (resumeData.projects.length > 0) {
+                content += '<div class="mb-4"><h3 class="text-lg font-bold border-b-2 border-gray-300 mb-2 pb-1">PROJECTS</h3>';
+                resumeData.projects.forEach(proj => {
+                    content += `<div class="mb-3"><div class="flex justify-between items-start flex-wrap gap-x-2"><h4 class="font-semibold">${proj.name} ${proj.technologies ? `<span class="italic text-gray-600 font-normal">| ${linkifyHtml(proj.technologies)}</span>` : ''}</h4><p class="text-sm font-semibold flex-shrink-0">${proj.date}</p></div>`;
+                    if (proj.description) { content += '<ul class="text-sm mt-1 ml-4 list-disc">'; proj.description.split('\n').filter(p => p.trim()).forEach(p => content += `<li class="mb-1">${linkifyHtml(p.trim())}</li>`); content += '</ul>'; }
+                    content += '</div>';
+                }); content += '</div>';
+            }
+            if (resumeData.skills) { content += `<div class="mb-4"><h3 class="text-lg font-bold border-b-2 border-gray-300 mb-2 pb-1">SKILLS</h3><p class="text-sm">${linkifyHtml(resumeData.skills).split(',').map(s => s.trim()).join(' • ')}</p></div>`; }
+            document.getElementById('previewContent').innerHTML = content || '<p class="text-gray-500 text-center italic">Start filling out the form to see your resume preview</p>';
+        }
+
+        function scrollToPreview() {
+            document.getElementById('preview-container').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        // --- PDF GENERATION (remains unchanged for a consistent, professional output) ---
+        function generatePDF() {
+            if (!resumeData.personal.fullName || !resumeData.personal.email) { showToast('errorToast'); return; }
+            try {
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF({ orientation: 'p', unit: 'pt', format: 'a4', putOnlyUsedFonts: true });
+                const pageWidth = doc.internal.pageSize.getWidth();
+                const margin = 40;
+                const contentWidth = pageWidth - margin * 2;
+                let y = margin;
+                const FONT_COLOR = [34, 34, 34], LINK_COLOR = [0, 102, 204], lineHeight = 1.2;
+                let pdfFont;
+                switch (resumeData.font) { case 'Merriweather': pdfFont = 'times'; break; default: pdfFont = 'helvetica'; break; }
+                const checkPageBreak = (space) => { if (y + space > doc.internal.pageSize.getHeight() - margin) { doc.addPage(); y = margin; } };
+                const addSectionHeading = (title) => { checkPageBreak(40); doc.setFont(pdfFont, 'bold'); doc.setFontSize(12); doc.setTextColor(...FONT_COLOR); doc.text(title.toUpperCase(), margin, y); y += 4; doc.setDrawColor(200, 200, 200); doc.setLineWidth(1); doc.line(margin, y, pageWidth - margin, y); y += 18; };
+                const addLinkifiedText = (text, startX, startY, options) => {
+                    const { contentWidth, lineHeight, fontSize, fontStyle = 'normal' } = options;
+                    let currentY = startY; doc.setFont(pdfFont, fontStyle); doc.setFontSize(fontSize);
+                    const lines = doc.splitTextToSize(text, contentWidth);
+                    const urlRegex = /((?:https?:\/\/|www\.)[^\s]+|[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}[^\s"'<>()]*)/g;
+                    lines.forEach(line => {
+                        checkPageBreak(fontSize * lineHeight); const segments = line.split(urlRegex).filter(Boolean); let currentX = startX;
+                        segments.forEach(segment => {
+                            urlRegex.lastIndex = 0;
+                            if (urlRegex.test(segment)) {
+                                doc.setTextColor(...LINK_COLOR);
+                                try { doc.textWithLink(getLinkNameFromUrl(segment), currentX, currentY, { url: ensureProtocol(segment) }); } catch (e) { doc.text(getLinkNameFromUrl(segment), currentX, currentY); }
+                                currentX += doc.getTextWidth(getLinkNameFromUrl(segment));
+                            } else {
+                                doc.setTextColor(...FONT_COLOR); doc.text(segment, currentX, currentY);
+                                currentX += doc.getTextWidth(segment);
+                            }
+                        });
+                        currentY += fontSize * lineHeight;
+                    }); return currentY - startY;
+                };
+                doc.setFont(pdfFont, 'bold'); doc.setFontSize(26); doc.setTextColor(...FONT_COLOR); doc.text(resumeData.personal.fullName, pageWidth / 2, y, { align: 'center' }); y += 20;
+                doc.setFont(pdfFont, 'normal'); doc.setFontSize(9); let contactLine1 = [resumeData.personal.location, resumeData.personal.phone, resumeData.personal.email].filter(Boolean).join('  •  '); doc.text(contactLine1, pageWidth / 2, y, { align: 'center' }); y += 12;
+                const socialLinks = [resumeData.personal.link1, resumeData.personal.link2].map(linkUrl => linkUrl && { text: getLinkNameFromUrl(linkUrl), url: ensureProtocol(linkUrl) }).filter(link => link && link.text);
+                if (socialLinks.length > 0) { let totalWidth = socialLinks.reduce((w, link) => w + doc.getTextWidth(link.text), 0) + (doc.getTextWidth('  •  ') * (socialLinks.length - 1)); let startX = pageWidth / 2 - totalWidth / 2; socialLinks.forEach((link, index) => { doc.setTextColor(...LINK_COLOR); doc.textWithLink(link.text, startX, y, { url: link.url }); startX += doc.getTextWidth(link.text); if (index < socialLinks.length - 1) { doc.setTextColor(...FONT_COLOR); doc.text('  •  ', startX, y); startX += doc.getTextWidth('  •  '); } }); y += 20; } else { y += 10; }
+                if (resumeData.summary) { addSectionHeading('Summary'); y += addLinkifiedText(resumeData.summary, margin, y, { contentWidth, lineHeight, fontSize: 10 }) + 10; }
+                if (resumeData.experience.length > 0) { addSectionHeading('Experience'); resumeData.experience.forEach(exp => { checkPageBreak(60); doc.setFont(pdfFont, 'bold'); doc.setFontSize(11); doc.text(exp.title, margin, y); doc.setFont(pdfFont, 'normal'); doc.text(`${exp.startDate} - ${exp.endDate}`, pageWidth - margin, y, { align: 'right' }); y += 11 * lineHeight; doc.setFont(pdfFont, 'italic'); doc.setFontSize(10); doc.text(exp.company, margin, y); doc.text(exp.location, pageWidth - margin, y, { align: 'right' }); y += 10 * lineHeight + 4; if (exp.description) { exp.description.split('\n').filter(p => p.trim()).forEach(point => { y += addLinkifiedText(`•  ${point.trim()}`, margin + 10, y, { contentWidth: contentWidth - 10, lineHeight, fontSize: 10 }); }); } y += 15; }); }
+                if (resumeData.education.length > 0) { addSectionHeading('Education'); resumeData.education.forEach(edu => { checkPageBreak(60); doc.setFont(pdfFont, 'bold'); doc.setFontSize(11); doc.text(edu.degree, margin, y); doc.setFont(pdfFont, 'normal'); doc.text(`${edu.startDate} - ${edu.endDate}`, pageWidth - margin, y, { align: 'right' }); y += 11 * lineHeight; doc.setFont(pdfFont, 'italic'); doc.setFontSize(10); doc.text(edu.institution, margin, y); doc.text(edu.location, pageWidth - margin, y, { align: 'right' }); y += 10 * lineHeight + 4; if (edu.details) { edu.details.split('\n').filter(p => p.trim()).forEach(point => { y += addLinkifiedText(`•  ${point.trim()}`, margin + 10, y, { contentWidth: contentWidth - 10, lineHeight, fontSize: 10 }); }); } y += 15; }); }
+                if (resumeData.projects.length > 0) { addSectionHeading('Projects'); resumeData.projects.forEach(proj => { checkPageBreak(60); const dateWidth = doc.getTextWidth(proj.date) + 10; const titleText = `${proj.name}${proj.technologies ? ` | ${proj.technologies}` : ''}`; const titleHeight = addLinkifiedText(titleText, margin, y, { contentWidth: contentWidth - dateWidth, lineHeight, fontSize: 11, fontStyle: 'bold' }); doc.setFont(pdfFont, 'normal'); doc.setFontSize(11); doc.text(proj.date, pageWidth - margin, y, { align: 'right' }); y += titleHeight + 4; if (proj.description) { proj.description.split('\n').filter(p => p.trim()).forEach(point => { y += addLinkifiedText(`•  ${point.trim()}`, margin + 10, y, { contentWidth: contentWidth - 10, lineHeight, fontSize: 10 }); }); } y += 15; }); }
+                if (resumeData.skills) { addSectionHeading('Skills'); const skillsText = resumeData.skills.split(',').map(s => s.trim()).join('  •  '); y += addLinkifiedText(skillsText, margin, y, { contentWidth, lineHeight, fontSize: 10 }); }
+                doc.save(`${resumeData.personal.fullName.replace(/\s+/g, '_')}_Resume.pdf`); showToast('successToast');
+            } catch (error) {
+                console.error('Error generating PDF:', error); const errSpan = document.querySelector('#errorToast span'); errSpan.textContent = 'An error occurred generating the PDF.'; showToast('errorToast'); setTimeout(() => { errSpan.textContent = 'Please fill in your Name and Email!'; }, 3500);
+            }
+        }
+        
+        function showToast(toastId) {
+            const toast = document.getElementById(toastId);
+            toast.style.transform = 'translateX(0)';
+            setTimeout(() => { toast.style.transform = 'translateX(calc(100% + 1rem))'; }, 3000);
+        }
+
+    </script>
+</body>
+</html>
